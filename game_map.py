@@ -77,7 +77,7 @@ class GameMap:
         entities_sorted_for_rendering = sorted(self.entities, key=lambda x: x.render_order.value)
 
         for entity in entities_sorted_for_rendering:
-            if self.visible[entity.x, entity.y]:
+            if 0 <= entity.x < self.width and 0 <= entity.y < self.height and self.visible[entity.x, entity.y]:
                 console.print(x=entity.x, y=entity.y, string=entity.char, fg=entity.color)
 
 
