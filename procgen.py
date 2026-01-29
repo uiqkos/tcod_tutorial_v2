@@ -120,7 +120,7 @@ def tunnel_between(start: Tuple[int, int], end: Tuple[int, int]) -> Iterator[Tup
     """Return an L-shaped tunnel between these two points."""
     x1, y1 = start
     x2, y2 = end
-    if random.random() < 0.5:  # 50% chance.
+    if random.random() < 0.05:  # 50% chance.
         # Move horizontally, then vertically.
         corner_x, corner_y = x2, y1
     else:
