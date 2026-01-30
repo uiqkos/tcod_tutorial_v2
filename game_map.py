@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterator, Tuple, TYPE_CHECKING
+from typing import Iterator, Optional, TYPE_CHECKING
 
 import numpy as np
 
@@ -8,25 +8,14 @@ import tile_types
 
 if TYPE_CHECKING:
     from entity import Entity
-    from tcod import Console
-    from engine import Engine
 
 
 class GameMap:
-    def __init__(
-        self,
-        engine: Engine,
-        width: int,
-        height: int,
-        entities: set[Entity] = None,
-    ):
-        self.engine = engine
+    def __init__(self, width: int, height: int, entities: set[Entity] = set()):
         self.width, self.height = width, height
-
-        self.entities = entities if entities is not None else set()
+        self.entities = entities
 
         self.tiles = np.full((width, height), fill_value=tile_types.wall, order="F")
-
         self.visible = np.full((width, height), fill_value=False, order="F")
         self.explored = np.full((width, height), fill_value=False, order="F")
 
@@ -34,21 +23,18 @@ class GameMap:
         """Return True if x and y are inside the bounds of this map."""
         return 0 <= x < self.width and 0 <= y < self.height
 
-    def render(self, console: Console) -> None:
-        """
-        Renders the map.
-        """
+    def render(self, console) -> None:
         # Draw all tiles in the game map
-        for x in range(self.width):
-            for y in range(self.height):
+        for y in range(self.height):
+            for x in range(self.width):
                 visible = self.visible[x, y]
-                wall = not self.tiles[x, y]["walkable"]
+                wall = not self.tiles[x, y].walkable
 
                 if visible:
-                    console.tiles_rgb[x, y] = self.tiles[x, y]["light"]
+                    console.tiles_rgb[x, y] = self.tiles[x, y].light
                     self.explored[x, y] = True
                 elif self.explored[x, y]:
-                    console.tiles_rgb[x, y] = self.tiles[x, y]["dark"]
+                    console.tiles_rgb[x, y] = self.tiles[x, y].dark
                 else:
                     console.tiles_rgb[x, y] = tile_types.SHROUD
 
