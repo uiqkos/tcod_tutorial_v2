@@ -120,7 +120,7 @@ def tunnel_between(start: Tuple[int, int], end: Tuple[int, int]) -> Iterator[Tup
     """Return an L-shaped tunnel between these two points."""
     x1, y1 = start
     x2, y2 = end
-    if random.random() < 0.05:  # 50% chance.
+    if random.random() < 0.5:  # 50% chance.
         # Move horizontally, then vertically.
         corner_x, corner_y = x2, y1
     else:
@@ -176,14 +176,14 @@ def generate_dungeon(
             for x, y in tunnel_between(rooms[-1].center, new_room.center):
                 dungeon.tiles[x, y] = tile_types.floor
 
-            center_of_last_room = new_room.center
+        center_of_last_room = new_room.center
 
         place_entities(new_room, dungeon, engine.game_world.current_floor)
 
-        dungeon.tiles[center_of_last_room] = tile_types.down_stairs
-        dungeon.downstairs_location = center_of_last_room
-
         # Finally, append the new room to the list.
         rooms.append(new_room)
+
+    dungeon.tiles[center_of_last_room] = tile_types.down_stairs
+    dungeon.downstairs_location = center_of_last_room
 
     return dungeon
