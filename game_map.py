@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterator, Optional, TYPE_CHECKING
+from typing import Iterator, Tuple, TYPE_CHECKING
 
 import numpy as np
 
@@ -11,9 +11,9 @@ if TYPE_CHECKING:
 
 
 class GameMap:
-    def __init__(self, width: int, height: int, entities: set[Entity] = set()):
+    def __init__(self, width: int, height: int, entities: set[Entity] = None):
         self.width, self.height = width, height
-        self.entities = entities
+        self.entities = entities if entities is not None else set()
 
         self.tiles = np.full((width, height), fill_value=tile_types.wall, order="F")
         self.visible = np.full((width, height), fill_value=False, order="F")
@@ -28,13 +28,12 @@ class GameMap:
         for y in range(self.height):
             for x in range(self.width):
                 visible = self.visible[x, y]
-                wall = not self.tiles[x, y].walkable
-
+                wall = not self.tiles[x, y]["walkable"]
                 if visible:
-                    console.tiles_rgb[x, y] = self.tiles[x, y].light
+                    console.tiles_rgb[x, y] = self.tiles[x, y]["light"]
                     self.explored[x, y] = True
                 elif self.explored[x, y]:
-                    console.tiles_rgb[x, y] = self.tiles[x, y].dark
+                    console.tiles_rgb[x, y] = self.tiles[x, y]["dark"]
                 else:
                     console.tiles_rgb[x, y] = tile_types.SHROUD
 
