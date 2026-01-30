@@ -112,8 +112,14 @@ def place_entities(room: RectangularRoom, dungeon: GameMap, floor_number: int) -
         x = random.randint(room.x1 + 1, room.x2 - 1)
         y = random.randint(room.y1 + 1, room.y2 - 1)
 
-        if not any(entity.x == x and entity.y == y for entity in dungeon.entities):
-            entity.spawn(dungeon, x, y)
+        # Ensure the spawn position is within bounds and not occupied, else retry up to N times
+        for _ in range(10):
+            if dungeon.in_bounds(x, y) and not any(e.x == x and e.y == y for e in dungeon.entities):
+                entity.spawn(dungeon, x, y)
+                break
+            x = random.randint(room.x1 + 1, room.x2 - 1)
+            y = random.randint(room.y1 + 1, room.y2 - 1)
+        # If no valid position found after retries, skip spawning this entity
 
 
 def tunnel_between(start: Tuple[int, int], end: Tuple[int, int]) -> Iterator[Tuple[int, int]]:
