@@ -32,11 +32,11 @@ class GameMap:
     @property
     def actors(self) -> Iterator[Actor]:
         """Iterate over this maps living actors."""
-        yield from (entity for entity in self.entities if isinstance(entity, Actor) and entity.is_alive)
+        yield from (entity for entity in self.entities if isinstance(entity, Actor) and entity.is_alive and self.in_bounds(entity.x, entity.y))
 
     @property
     def items(self) -> Iterator[Item]:
-        yield from (entity for entity in self.entities if isinstance(entity, Item))
+        yield from (entity for entity in self.entities if isinstance(entity, Item) and self.in_bounds(entity.x, entity.y))
 
     def get_blocking_entity_at_location(
         self,
@@ -44,14 +44,14 @@ class GameMap:
         location_y: int,
     ) -> Optional[Entity]:
         for entity in self.entities:
-            if entity.blocks_movement and entity.x == location_x and entity.y == location_y:
+            if self.in_bounds(entity.x, entity.y) and entity.blocks_movement and entity.x == location_x and entity.y == location_y:
                 return entity
 
         return None
 
     def get_actor_at_location(self, x: int, y: int) -> Optional[Actor]:
         for actor in self.actors:
-            if actor.x == x and actor.y == y:
+            if self.in_bounds(actor.x, actor.y) and actor.x == x and actor.y == y:
                 return actor
 
         return None
@@ -77,7 +77,7 @@ class GameMap:
         entities_sorted_for_rendering = sorted(self.entities, key=lambda x: x.render_order.value)
 
         for entity in entities_sorted_for_rendering:
-            if self.visible[entity.x, entity.y]:
+            if self.in_bounds(entity.x, entity.y) and self.visible[entity.x, entity.y]:
                 console.print(x=entity.x, y=entity.y, string=entity.char, fg=entity.color)
 
 

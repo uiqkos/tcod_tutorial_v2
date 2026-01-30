@@ -37,6 +37,8 @@ class Entity:
         blocks_movement: bool = False,
         render_order: RenderOrder = RenderOrder.CORPSE,
     ):
+        if parent and hasattr(parent, 'in_bounds') and not parent.in_bounds(x, y):
+            raise ValueError(f"Entity position ({x}, {y}) is out of bounds for map size ({parent.width}, {parent.height})")
         self.x = x
         self.y = y
         self.char = char
@@ -56,6 +58,8 @@ class Entity:
     def spawn(self: T, gamemap: GameMap, x: int, y: int) -> T:
         """Spawn a copy of this instance at the given location."""
         clone = copy.deepcopy(self)
+        if not gamemap.in_bounds(x, y):
+            raise ValueError(f"Spawn position ({x}, {y}) is out of bounds for map size ({gamemap.width}, {gamemap.height})")
         clone.x = x
         clone.y = y
         clone.parent = gamemap
@@ -64,8 +68,10 @@ class Entity:
 
     def place(self, x: int, y: int, gamemap: Optional[GameMap] = None) -> None:
         """Place this entitiy at a new location.  Handles moving across GameMaps."""
+        if gamemap and hasattr(gamemap, 'in_bounds') and not gamemap.in_bounds(x, y):
+            raise ValueError(f"Place position ({x}, {y}) is out of bounds for map size ({gamemap.width}, {gamemap.height})")
         self.x = x
-        self.y = x
+        self.y = y
         if gamemap:
             if hasattr(self, "parent"):  # Possibly uninitialized.
                 if self.parent is self.gamemap:
